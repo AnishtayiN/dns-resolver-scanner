@@ -14,6 +14,7 @@ import com.anishtayin.dnsscanner.dns.TxtImportResult
 import com.anishtayin.dnsscanner.dns.parseCustomIp
 import com.anishtayin.dnsscanner.dns.parseTxtImport
 import com.anishtayin.dnsscanner.dns.resultsToJson
+import com.anishtayin.dnsscanner.dns.resultsToMasterDnsResolvers
 import com.anishtayin.dnsscanner.dns.resultsToText
 import com.anishtayin.dnsscanner.dns.summarizeResults
 import kotlinx.coroutines.Job
@@ -184,6 +185,9 @@ class ScannerViewModel(application: Application) : AndroidViewModel(application)
 
     fun exportJson(): String =
         resultsToJson(_results.value, _lastScanTime.value ?: System.currentTimeMillis())
+
+    /** خروجی فایل ریزالورها با فرمت MasterDnsVPN (هر خط فقط یک IP ساده). */
+    fun exportMasterDns(): String = resultsToMasterDnsResolvers(_results.value)
 
     fun workingCount(): Int = _results.value.count { it.status == ResolverStatus.WORKING || it.status == ResolverStatus.SLOW }
 
