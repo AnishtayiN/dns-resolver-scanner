@@ -10,6 +10,8 @@ data class Resolver(
     val dotHost: String? = null,
     val dohUrl: String? = null,
     val custom: Boolean = false,
+    /** true یعنی این سرور از فایل TXT وارد شده است (زیرمجموعه‌ی سرورهای دلخواه). */
+    val imported: Boolean = false,
 )
 
 /** فهرست سرورهای عمومی شناخته‌شده. هر IP جداگانه آزمایش می‌شود. */

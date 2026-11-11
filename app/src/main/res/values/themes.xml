@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.DnsScanner" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowLightStatusBar">true</item>
-    </style>
+    <!-- حالت تیره/روشن را تم Compose مدیریت می‌کند؛ این فقط پنجره‌ی سیستمی است. -->
+    <style name="Theme.DnsScanner" parent="android:Theme.Material.NoActionBar" />
 </resources>

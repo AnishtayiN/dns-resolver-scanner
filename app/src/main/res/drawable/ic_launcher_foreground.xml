@@ -3,16 +3,32 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- آیکون رادار: دایره‌های هم‌مرکز + عقربهٔ سرعت -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,54m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0" />
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:pathData="M54,54m-34,0a34,34 0,1 1,68 0a34,34 0,1 1,-68 0" />
     <path
-        android:fillColor="#1565C0"
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#B3FFFFFF"
+        android:strokeWidth="4"
         android:pathData="M54,54m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M44,50h20v4h-20zM44,58h20v4h-20zM44,66h14v4h-14z" />
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#80FFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M54,54m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFC107"
+        android:strokeLineCap="round"
+        android:strokeWidth="6"
+        android:pathData="M54,54L76,32" />
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M54,54m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M68,68l16,16 -4,4 -16,-16z" />
+        android:pathData="M76,32m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
 </vector>

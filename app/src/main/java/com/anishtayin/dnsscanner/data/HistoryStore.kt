@@ -18,6 +18,7 @@ class HistoryStore(private val context: Context) {
     private val lastScanJsonKey = stringPreferencesKey("last_scan_json")
     private val lastScanTimeKey = longPreferencesKey("last_scan_time")
     private val customIpsKey = stringPreferencesKey("custom_ips")
+    private val importedIpsKey = stringPreferencesKey("imported_ips")
 
     suspend fun saveLastScan(json: String, scannedAtEpochMs: Long) {
         context.dataStore.edit { prefs ->
@@ -40,6 +41,19 @@ class HistoryStore(private val context: Context) {
     suspend fun loadCustomIps(): List<String> {
         val prefs = context.dataStore.data.firstOrNull() ?: return emptyList()
         val raw = prefs[customIpsKey] ?: return emptyList()
+        return raw.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+    }
+
+    /** سرورهای واردشده از فایل TXT جدا از سرورهای دستی ذخیره می‌شوند تا بشود فقط آن‌ها را پاک کرد. */
+    suspend fun saveImportedIps(ips: List<String>) {
+        context.dataStore.edit { prefs ->
+            prefs[importedIpsKey] = ips.joinToString(",")
+        }
+    }
+
+    suspend fun loadImportedIps(): List<String> {
+        val prefs = context.dataStore.data.firstOrNull() ?: return emptyList()
+        val raw = prefs[importedIpsKey] ?: return emptyList()
         return raw.split(",").map { it.trim() }.filter { it.isNotEmpty() }
     }
 }
