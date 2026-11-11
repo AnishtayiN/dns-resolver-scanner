@@ -218,6 +218,15 @@ fun ScannerScreen(
                             Text(stringResource(R.string.export_json))
                         }
                     }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(
+                            onClick = { onShare(viewModel.exportMasterDns(), "MasterDnsVPN resolvers") },
+                            enabled = results.isNotEmpty(),
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(stringResource(R.string.export_masterdns))
+                        }
+                    }
                     if (importedIps.isNotEmpty()) {
                         TextButton(onClick = { showClearImportedDialog = true }) {
                             Text(stringResource(R.string.clear_imported, importedIps.size))

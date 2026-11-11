@@ -19,6 +19,7 @@
     <string name="copied">Copied</string>
     <string name="export_txt">Export TXT</string>
     <string name="export_json">Export JSON</string>
+    <string name="export_masterdns">MasterDnsVPN export</string>
     <string name="add_custom">Custom resolver</string>
     <string name="custom_ip_hint">Resolver IP address (e.g. 1.1.1.1)</string>
     <string name="invalid_ip">Not a valid IP address.</string>

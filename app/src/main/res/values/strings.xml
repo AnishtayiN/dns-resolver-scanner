@@ -19,6 +19,7 @@
     <string name="copied">کپی شد</string>
     <string name="export_txt">خروجی TXT</string>
     <string name="export_json">خروجی JSON</string>
+    <string name="export_masterdns">خروجی MasterDnsVPN</string>
     <string name="add_custom">سرور دلخواه</string>
     <string name="custom_ip_hint">آدرس IP سرور (مثلاً 1.1.1.1)</string>
     <string name="invalid_ip">آدرس IP معتبر نیست.</string>

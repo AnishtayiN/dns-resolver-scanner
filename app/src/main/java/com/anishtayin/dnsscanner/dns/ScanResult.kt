@@ -57,6 +57,22 @@ fun resultsToText(results: List<ScanResult>): String {
     return sb.toString()
 }
 
+/**
+ * خروجی فایل ریزالورها با فرمت MasterDnsVPN: هر خط فقط یک IP ساده،
+ * مرتب‌شده بر اساس تأخیر (سریع‌ترین اول). فقط سرورهایی که جواب درست
+ * داده‌اند (سالم و کند) می‌آیند. خط‌های `#` در آن فرمت توضیح‌اند و
+ * خوانده نمی‌شوند، پس سربرگ فقط توضیح است.
+ */
+fun resultsToMasterDnsResolvers(results: List<ScanResult>): String {
+    val sb = StringBuilder()
+    sb.appendLine("# DNS Scanner — working resolvers")
+    sb.appendLine("# Save this file as client_resolvers.txt for the MasterDnsVPN client")
+    for (r in rankResults(results).filter { it.correct }.distinctBy { it.resolver.ip }) {
+        sb.appendLine(r.resolver.ip)
+    }
+    return sb.toString()
+}
+
 /** خروجی JSON از همه‌ی نتایج (ساخته‌شده با دست، بدون وابستگی). */
 fun resultsToJson(results: List<ScanResult>, scannedAtEpochMs: Long): String {
     fun esc(s: String): String = s.replace("\\", "\\\\").replace("\"", "\\\"")
