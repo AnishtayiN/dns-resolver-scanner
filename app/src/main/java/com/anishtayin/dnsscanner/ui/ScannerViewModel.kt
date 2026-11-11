@@ -8,10 +8,14 @@ import com.anishtayin.dnsscanner.dns.BUILTIN_RESOLVERS
 import com.anishtayin.dnsscanner.dns.Benchmark
 import com.anishtayin.dnsscanner.dns.Resolver
 import com.anishtayin.dnsscanner.dns.ResolverStatus
+import com.anishtayin.dnsscanner.dns.ResultsSummary
 import com.anishtayin.dnsscanner.dns.ScanResult
+import com.anishtayin.dnsscanner.dns.TxtImportResult
 import com.anishtayin.dnsscanner.dns.parseCustomIp
+import com.anishtayin.dnsscanner.dns.parseTxtImport
 import com.anishtayin.dnsscanner.dns.resultsToJson
 import com.anishtayin.dnsscanner.dns.resultsToText
+import com.anishtayin.dnsscanner.dns.summarizeResults
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +23,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
+
+/** نتیجه‌ی یک بار تلاش برای وارد کردن فایل TXT. */
+sealed interface TxtImportOutcome {
+    /** فایل خالی بود یا فقط خط خالی/توضیح داشت. */
+    data object EmptyFile : TxtImportOutcome
+
+    /** فایل باز یا خوانده نشد. */
+    data object UnreadableFile : TxtImportOutcome
+
+    /** فایل خوانده و تجزیه شد؛ خلاصه‌ی صادقانه‌ی آن در [result] است. */
+    data class Completed(val result: TxtImportResult) : TxtImportOutcome
+}
 
 class ScannerViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -42,23 +58,32 @@ class ScannerViewModel(application: Application) : AndroidViewModel(application)
     private val _customIps = MutableStateFlow<List<String>>(emptyList())
     val customIps: StateFlow<List<String>> = _customIps.asStateFlow()
 
+    /** سرورهایی که از فایل TXT وارد شده‌اند (جدا از سرورهای دستی). */
+    private val _importedIps = MutableStateFlow<List<String>>(emptyList())
+    val importedIps: StateFlow<List<String>> = _importedIps.asStateFlow()
+
     private val _invalidIpAttempt = MutableStateFlow(false)
     val invalidIpAttempt: StateFlow<Boolean> = _invalidIpAttempt.asStateFlow()
+
+    private val _importOutcome = MutableStateFlow<TxtImportOutcome?>(null)
+    val importOutcome: StateFlow<TxtImportOutcome?> = _importOutcome.asStateFlow()
 
     private var scanJob: Job? = null
 
     init {
         viewModelScope.launch {
             _customIps.value = store.loadCustomIps()
+            _importedIps.value = store.loadImportedIps()
             val (json, time) = store.loadLastScan()
             _lastScanTime.value = time
-            if (json != null) _results.value = parseResultsJson(json)
+            if (json != null) _results.value = parseResultsJson(json, _importedIps.value.toSet())
         }
     }
 
     private fun allResolvers(): List<Resolver> {
         val custom = _customIps.value.map { Resolver("Custom", it, custom = true) }
-        return BUILTIN_RESOLVERS + custom
+        val imported = _importedIps.value.map { Resolver("Custom", it, custom = true, imported = true) }
+        return BUILTIN_RESOLVERS + custom + imported
     }
 
     fun scanAll() {
@@ -91,7 +116,7 @@ class ScannerViewModel(application: Application) : AndroidViewModel(application)
             return false
         }
         _invalidIpAttempt.value = false
-        if (ip in _customIps.value) return true
+        if (ip in _customIps.value || ip in _importedIps.value) return true
         val updated = _customIps.value + ip
         _customIps.value = updated
         viewModelScope.launch { store.saveCustomIps(updated) }
@@ -103,10 +128,56 @@ class ScannerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun removeCustomIp(ip: String) {
-        val updated = _customIps.value - ip
-        _customIps.value = updated
-        viewModelScope.launch { store.saveCustomIps(updated) }
+        val updatedCustom = _customIps.value - ip
+        _customIps.value = updatedCustom
+        val updatedImported = _importedIps.value - ip
+        _importedIps.value = updatedImported
+        viewModelScope.launch {
+            store.saveCustomIps(updatedCustom)
+            store.saveImportedIps(updatedImported)
+        }
         _results.value = _results.value.filterNot { it.resolver.ip == ip }
+    }
+
+    /**
+     * وارد کردن سرورها از محتوای خوانده‌شده‌ی یک فایل TXT.
+     * فایل خالی، یا فایلی که فقط توضیح دارد، [TxtImportOutcome.EmptyFile] می‌دهد؛
+     * فایلی با صفر آی‌پی معتبر جدید هم با همان خلاصه‌ی صادقانه گزارش می‌شود.
+     */
+    fun importTxtContent(content: String) {
+        if (content.isBlank()) {
+            _importOutcome.value = TxtImportOutcome.EmptyFile
+            return
+        }
+        val existing = BUILTIN_RESOLVERS.map { it.ip }.toSet() + _customIps.value + _importedIps.value
+        val result = parseTxtImport(content, existing)
+        if (!result.hadContent) {
+            _importOutcome.value = TxtImportOutcome.EmptyFile
+            return
+        }
+        if (result.added.isNotEmpty()) {
+            val updated = _importedIps.value + result.added
+            _importedIps.value = updated
+            viewModelScope.launch { store.saveImportedIps(updated) }
+        }
+        _importOutcome.value = TxtImportOutcome.Completed(result)
+    }
+
+    /** وقتی خواندن فایل از انتخاب‌گر سیستم ناموفق بود. */
+    fun reportImportUnreadable() {
+        _importOutcome.value = TxtImportOutcome.UnreadableFile
+    }
+
+    fun clearImportOutcome() {
+        _importOutcome.value = null
+    }
+
+    /** پاک کردن همه‌ی سرورهای واردشده از فایل (سرورهای دستی و داخلی می‌مانند). */
+    fun clearImported() {
+        val importedSet = _importedIps.value.toSet()
+        _importedIps.value = emptyList()
+        viewModelScope.launch { store.saveImportedIps(emptyList()) }
+        _results.value = _results.value.filterNot { it.resolver.ip in importedSet }
     }
 
     fun exportText(): String = resultsToText(_results.value)
@@ -116,8 +187,11 @@ class ScannerViewModel(application: Application) : AndroidViewModel(application)
 
     fun workingCount(): Int = _results.value.count { it.status == ResolverStatus.WORKING || it.status == ResolverStatus.SLOW }
 
+    /** خلاصه‌ی نتایج اسکن فعلی (سریع‌ترین، میانگین، تعداد سالم). */
+    fun summary(): ResultsSummary = summarizeResults(_results.value)
+
     /** بازسازی نتایج از JSON ذخیره‌شده‌ی خودمان (فقط تاریخچه‌ی نمایشی). */
-    private fun parseResultsJson(json: String): List<ScanResult> {
+    private fun parseResultsJson(json: String, importedIps: Set<String>): List<ScanResult> {
         return try {
             val root = JSONObject(json)
             val arr: JSONArray = root.getJSONArray("results")
@@ -127,7 +201,7 @@ class ScannerViewModel(application: Application) : AndroidViewModel(application)
                 val ip = o.getString("ip")
                 val provider = o.getString("provider")
                 val builtin = BUILTIN_RESOLVERS.find { it.ip == ip }
-                val resolver = builtin ?: Resolver(provider, ip, custom = true)
+                val resolver = builtin ?: Resolver(provider, ip, custom = true, imported = ip in importedIps)
                 fun opt(key: String): Long? =
                     if (o.isNull(key)) null else o.getLong(key)
                 val status = ResolverStatus.valueOf(o.getString("status"))

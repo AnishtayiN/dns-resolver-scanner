@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">اسکنر DNS</string>
+    <string name="app_tagline">سریع‌ترین DNS را پیدا کن</string>
     <string name="app_description">سریع‌ترین سرور عمومی DNS را با اندازه‌گیری تأخیر واقعی پیدا کنید. هر سرور با یک پرس‌وجوی واقعی DNS آزمایش می‌شود؛ هیچ عددی بدون پرس‌وجو نمایش داده نمی‌شود.</string>
     <string name="scan_all">اسکن همه</string>
     <string name="cancel">لغو</string>
     <string name="add">افزودن</string>
     <string name="remove">حذف</string>
+    <string name="clear">پاک کردن</string>
+    <string name="ok">باشه</string>
     <string name="scanning_progress">در حال اسکن… %1$d از %2$d</string>
     <string name="last_scan">آخرین اسکن: %1$s — %2$d سرور سالم</string>
     <string name="no_results_yet">هنوز اسکنی انجام نشده است. دکمهٔ «اسکن همه» را بزنید.</string>
+    <string name="results_title">نتایج</string>
     <string name="best_latency">بهترین تأخیر: %1$s میلی‌ثانیه (%2$s)</string>
     <string name="no_latency">بدون تأخیر ثبت‌شده</string>
     <string name="tap_to_copy">برای کپی کردن IP روی کارت بزنید.</string>
@@ -23,4 +27,28 @@
     <string name="status_no_answer">بدون پاسخ</string>
     <string name="status_wrong_answer">پاسخ نادرست</string>
     <string name="honesty_note">نتیجه به شبکهٔ لحظهٔ اسکن بستگی دارد؛ سروری که الان سریع است ممکن است بعداً کند شود. این برنامه DNS گوشی را تغییر نمی‌دهد، فقط سرعت را اندازه می‌گیرد.</string>
+    <string name="summary_title">خلاصهٔ نتایج</string>
+    <string name="summary_fastest">سریع‌ترین</string>
+    <string name="summary_average">میانگین</string>
+    <string name="summary_average_sub">سرورهای سالم</string>
+    <string name="summary_working">سالم</string>
+    <string name="summary_working_sub">از کل</string>
+    <string name="chart_title">نمودار تأخیر</string>
+    <string name="chart_subtitle">میله‌ها نسبت به سریع‌ترین سرور کشیده شده‌اند؛ میلهٔ کامل یعنی سریع‌ترین.</string>
+    <string name="badge_custom">دلخواه</string>
+    <string name="badge_imported">واردشده از فایل</string>
+    <string name="custom_count">%1$d سرور دلخواه (%2$d واردشده از فایل)</string>
+    <string name="import_txt">وارد کردن از فایل TXT</string>
+    <string name="txt_format_hint">قالب فایل TXT: هر خط یک IP؛ خط‌هایی که با # شروع می‌شوند توضیح‌اند. نمونه:\n1.1.1.1\n8.8.8.8\n# توضیح\n9.9.9.9, 149.112.112.112</string>
+    <string name="import_result_title">نتیجهٔ وارد کردن</string>
+    <string name="import_summary">%1$d سرور اضافه شد • %2$d تکراری رد شد • %3$d نامعتبر رد شد</string>
+    <string name="import_no_valid">هیچ IP معتبر جدیدی در فایل نبود.</string>
+    <string name="import_invalid_examples">نمونه‌های نامعتبر:</string>
+    <string name="import_empty_title">فایل خالی است</string>
+    <string name="import_empty">فایل انتخاب‌شده خالی است یا فقط خط خالی و توضیح (#) دارد.</string>
+    <string name="import_error_title">خطا در خواندن فایل</string>
+    <string name="import_unreadable">فایل خوانده نشد. دوباره تلاش کنید یا فایل دیگری انتخاب کنید.</string>
+    <string name="clear_imported">پاک کردن سرورهای واردشده (%1$d)</string>
+    <string name="clear_imported_title">پاک کردن سرورهای واردشده</string>
+    <string name="clear_imported_confirm">همهٔ %1$d سرور واردشده از فایل پاک شوند؟ سرورهای دستی و داخلی می‌مانند.</string>
 </resources>

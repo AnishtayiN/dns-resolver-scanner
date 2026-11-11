@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.DnsScanner" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowLightStatusBar">true</item>
-    </style>
+    <!-- DayNight تا در حالت تیره، نوار وضعیت و پس‌زمینه‌ی پنجره هم تیره شود. -->
+    <style name="Theme.DnsScanner" parent="android:Theme.Material.DayNight.NoActionBar" />
 </resources>
